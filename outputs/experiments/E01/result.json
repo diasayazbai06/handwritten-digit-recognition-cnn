@@ -1,0 +1,27 @@
+{
+  "config": {
+    "id": "E01",
+    "name": "Логистикалық регрессия (baseline)",
+    "model": "logreg",
+    "seed": 42,
+    "C": 0.1,
+    "max_iter": 500,
+    "hp_text": "C=0.1; max_iter=500",
+    "note": "scikit-learn, пиксельдер бойынша"
+  },
+  "params": 7850,
+  "best_val_acc": 0.9168333333333333,
+  "test_acc": 0.9263,
+  "train_time_sec": 81.8,
+  "environment": {
+    "os": "Windows 11",
+    "python": "3.12.1",
+    "torch": "2.11.0+cpu",
+    "torchvision": "0.26.0+cpu",
+    "numpy": "2.2.4",
+    "scikit-learn": "1.8.0",
+    "device": "cpu",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13620H",
+    "threads": 10
+  }
+}

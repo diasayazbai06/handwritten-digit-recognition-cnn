@@ -1,0 +1,15 @@
+{
+  "id": "E03",
+  "name": "DigitCNN",
+  "model": "cnn",
+  "seed": 42,
+  "epochs": 8,
+  "batch_size": 128,
+  "step_size": 3,
+  "gamma": 0.5,
+  "num_workers": 4,
+  "lr": 0.001,
+  "augment": false,
+  "hp_text": "lr=0.001; batch=128; 8 дәуір",
+  "note": "аугментациясыз"
+}

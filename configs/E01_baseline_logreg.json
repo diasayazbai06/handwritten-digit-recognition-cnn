@@ -1,0 +1,10 @@
+{
+  "id": "E01",
+  "name": "Логистикалық регрессия (baseline)",
+  "model": "logreg",
+  "seed": 42,
+  "C": 0.1,
+  "max_iter": 500,
+  "hp_text": "C=0.1; max_iter=500",
+  "note": "scikit-learn, пиксельдер бойынша"
+}

@@ -1,0 +1,34 @@
+{
+  "config": {
+    "id": "E05",
+    "name": "DigitCNN + аугментация",
+    "model": "cnn",
+    "seed": 42,
+    "epochs": 8,
+    "batch_size": 128,
+    "step_size": 3,
+    "gamma": 0.5,
+    "num_workers": 4,
+    "lr": 0.0003,
+    "augment": true,
+    "hp_text": "lr=0.0003; batch=128; 8 дәуір",
+    "note": "кіші оқыту жылдамдығы"
+  },
+  "params": 468010,
+  "best_val_acc": 0.9915,
+  "best_epoch": 7,
+  "test_acc": 0.9922,
+  "train_time_sec": 1369.1,
+  "weights": "models/E05.pt",
+  "environment": {
+    "os": "Windows 11",
+    "python": "3.12.1",
+    "torch": "2.11.0+cpu",
+    "torchvision": "0.26.0+cpu",
+    "numpy": "2.2.4",
+    "scikit-learn": "1.8.0",
+    "device": "cpu",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13620H",
+    "threads": 10
+  }
+}

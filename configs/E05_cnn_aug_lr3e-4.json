@@ -1,0 +1,15 @@
+{
+  "id": "E05",
+  "name": "DigitCNN + аугментация",
+  "model": "cnn",
+  "seed": 42,
+  "epochs": 8,
+  "batch_size": 128,
+  "step_size": 3,
+  "gamma": 0.5,
+  "num_workers": 4,
+  "lr": 0.0003,
+  "augment": true,
+  "hp_text": "lr=0.0003; batch=128; 8 дәуір",
+  "note": "кіші оқыту жылдамдығы"
+}

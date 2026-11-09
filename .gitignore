@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+data/MNIST/
+.venv/
+venv/
+.env
+.env.*
+*.db
+.vercel/
+node_modules/
+*.docx
+*.pptx

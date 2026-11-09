@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DigitNet — қолжазба цифрларды тану</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%236d5efc'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>7</text></svg>">
+</head>
+<body>
+
+<!-- ============ Навигация ============ -->
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="#top" class="logo"><span class="logo-mark">7</span><span>Digit<b>Net</b></span></a>
+    <nav class="nav-links">
+      <a href="#demo">Сынау</a>
+      <a href="#how">Жұмыс принципі</a>
+      <a href="#model">Модель</a>
+      <a href="#results">Нәтижелер</a>
+      <a href="#about">Жоба туралы</a>
+    </nav>
+    <a href="#demo" class="btn btn-sm btn-primary">Сынап көру</a>
+  </div>
+</header>
+
+<!-- ============ Hero ============ -->
+<section class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="container hero-grid">
+    <div>
+      <span class="badge">Терең оқыту · Курстық жұмыс</span>
+      <h1>Қолжазба цифрларды <span class="grad">нейрондық желі</span> арқылы тану</h1>
+      <p class="lead">Конволюциялық нейрондық желі (CNN) MNIST деректер жиынындағы 54 000 суретте оқытылды.
+        Цифрды тышқанмен салыңыз немесе суретін жүктеңіз — модель оны бірден таниды.</p>
+      <div class="hero-cta">
+        <a href="#demo" class="btn btn-primary">Цифр салу →</a>
+        <a href="#model" class="btn btn-ghost">Модель архитектурасы</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>{{ '%.2f' % (m.test_acc*100) }}%</b><span>тест дәлдігі</span></div>
+        <div class="stat"><b>{{ '{:,}'.format(m.params).replace(',', ' ') }}</b><span>параметр</span></div>
+        <div class="stat"><b>{{ m.test_errors }}</b><span>қате / 10 000</span></div>
+        <div class="stat"><b>{{ m.epochs }}</b><span>дәуір</span></div>
+      </div>
+    </div>
+    <div class="hero-card" id="heroCard">
+      <div class="hc-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="hc-title">live · MNIST тест жиыны</span></div>
+      <div class="hc-body">
+        <img id="heroImg" alt="MNIST мысалы" class="pixel">
+        <div class="hc-res">
+          <span class="muted">Болжам</span>
+          <div class="hc-digit" id="heroDigit">–</div>
+          <div class="hc-conf"><span id="heroConf">…</span> сенімділік</div>
+          <div class="hc-true">Нақты цифр: <b id="heroTrue">–</b></div>
+        </div>
+      </div>
+      <div class="hc-bars" id="heroBars"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Демо ============ -->
+<section class="section" id="demo">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Интерактивті демо</span>
+      <h2>Өзіңіз сынап көріңіз</h2>
+      <p>Цифрды төмендегі тақтаға салыңыз — нәтиже салған сәтте жаңарып отырады.</p>
+    </div>
+
+    <div class="demo-grid">
+      <!-- Сол жақ: енгізу -->
+      <div class="card">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="draw">✏️ Салу</button>
+          <button class="tab" data-tab="upload">📷 Жүктеу</button>
+          <button class="tab" data-tab="sample">🎲 MNIST мысалы</button>
+        </div>
+
+        <div class="tab-pane active" id="pane-draw">
+          <div class="canvas-wrap">
+            <canvas id="pad" width="280" height="280" aria-label="Цифр салатын тақта"></canvas>
+            <div class="canvas-hint" id="hint">Осы жерге 0–9 цифрын салыңыз</div>
+          </div>
+          <div class="row">
+            <button class="btn btn-ghost" id="clearBtn">🗑 Тазалау</button>
+            <label class="slider">Қалыңдық <input type="range" id="brush" min="12" max="30" value="20"></label>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="pane-upload">
+          <label class="drop" id="drop">
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <div class="drop-icon">⬆</div>
+            <b>Суретті осында тастаңыз</b>
+            <span>немесе таңдау үшін басыңыз · PNG, JPG, BMP</span>
+            <img id="uploadPreview" alt="" hidden>
+          </label>
+          <p class="note">Ақ қағазға қара қаламмен жазылған цифрдың фотосы да жарайды — жүйе фонды өзі инверсиялайды.</p>
+        </div>
+
+        <div class="tab-pane" id="pane-sample">
+          <div class="sample-box">
+            <img id="sampleImg" class="pixel" alt="MNIST мысалы">
+            <div>
+              <div class="muted">Тест суреті <b id="sampleIdx">—</b></div>
+              <div class="sample-true">Нақты цифр: <b id="sampleTrue">—</b></div>
+              <div id="sampleVerdict" class="verdict"></div>
+              <button class="btn btn-primary" id="sampleBtn">Келесі мысал →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Оң жақ: нәтиже -->
+      <div class="card result-card">
+        <div class="result-top">
+          <div class="ring" id="ring"><div class="ring-in"><div class="big-digit" id="digit">?</div></div></div>
+          <div class="result-meta">
+            <span class="eyebrow">Нәтиже</span>
+            <div class="conf"><b id="conf">—</b> сенімділік</div>
+            <div class="muted" id="status">Цифр салынғанын күтуде…</div>
+            <div class="mini">
+              <img id="preview" class="pixel" alt="28×28">
+              <span>Модельге берілетін<br>28×28 сурет</span>
+            </div>
+          </div>
+        </div>
+        <div class="bars" id="bars"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Жұмыс принципі ============ -->
+<section class="section alt" id="how">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Pipeline</span>
+      <h2>Жүйе қалай жұмыс істейді</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><span>01</span><h4>Кіріс</h4><p>Тақтаға салынған немесе жүктелген сурет серверге жіберіледі.</p></div>
+      <div class="step"><span>02</span><h4>Алдын ала өңдеу</h4><p>Сұр түске айналдыру, инверсия, цифрды қию және 20×20 өлшемге келтіру.</p></div>
+      <div class="step"><span>03</span><h4>Ортаға қою</h4><p>28×28 кенепте масса орталығы бойынша орналастыру, нормализация.</p></div>
+      <div class="step"><span>04</span><h4>CNN</h4><p>4 конволюциялық қабат белгілерді (жиек, доға, бұрыш) анықтайды.</p></div>
+      <div class="step"><span>05</span><h4>Softmax</h4><p>10 цифрдың ықтималдығы есептеліп, ең үлкені нәтиже болады.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Модель ============ -->
+<section class="section" id="model">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Архитектура</span>
+      <h2>DigitCNN моделі</h2>
+      <p>VGG стиліндегі ықшам желі: екі конволюциялық блок және толық байланысқан классификатор.</p>
+    </div>
+    <div class="arch">
+      <div class="layer l-in"><b>Кіріс</b><span>1×28×28</span></div>
+      <div class="layer l-conv"><b>Conv 3×3 ×32</b><span>BN · ReLU · Conv</span><i>32×28×28</i></div>
+      <div class="layer l-pool"><b>MaxPool</b><span>Dropout 0.25</span><i>32×14×14</i></div>
+      <div class="layer l-conv"><b>Conv 3×3 ×64</b><span>BN · ReLU · Conv</span><i>64×14×14</i></div>
+      <div class="layer l-pool"><b>MaxPool</b><span>Dropout 0.25</span><i>64×7×7</i></div>
+      <div class="layer l-fc"><b>Dense 128</b><span>ReLU · Dropout 0.5</span><i>3136 → 128</i></div>
+      <div class="layer l-out"><b>Softmax</b><span>10 класс</span><i>0 … 9</i></div>
+    </div>
+    <div class="hp">
+      <div><span>Оңтайландырғыш</span><b>Adam, lr 0.001</b></div>
+      <div><span>Шығын функциясы</span><b>Cross-Entropy</b></div>
+      <div><span>Пакет өлшемі</span><b>128</b></div>
+      <div><span>Аугментация</span><b>±10°, жылжу, масштаб</b></div>
+      <div><span>Оқыту уақыты (CPU)</span><b>{{ '%.1f' % (m.train_time_sec/60) }} мин</b></div>
+      <div><span>Фреймворк</span><b>PyTorch</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Нәтижелер ============ -->
+<section class="section alt" id="results">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Бағалау</span>
+      <h2>Оқыту нәтижелері</h2>
+      <p>Модель 10 000 тест суретінде бағаланды — оқытуда бұл суреттер қолданылмаған.</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><b>{{ '%.2f' % (m.test_acc*100) }}%</b><span>Accuracy</span></div>
+      <div class="kpi"><b>{{ '%.2f' % (m.macro_avg.precision*100) }}%</b><span>Precision</span></div>
+      <div class="kpi"><b>{{ '%.2f' % (m.macro_avg.recall*100) }}%</b><span>Recall</span></div>
+      <div class="kpi"><b>{{ '%.2f' % (m['macro_avg']['f1-score']*100) }}%</b><span>F1-өлшемі</span></div>
+    </div>
+    <figure class="card fig wide"><img src="/results/training_curves.png" alt="Оқыту қисықтары"><figcaption>Шығын функциясы мен дәлдіктің дәуірлер бойынша өзгеруі</figcaption></figure>
+    <div class="res-grid">
+      <figure class="card fig"><img src="/results/confusion_matrix.png" alt="Қателіктер матрицасы"><figcaption>Қателіктер матрицасы: диагональ — дұрыс жауаптар</figcaption></figure>
+      <div class="card">
+        <h3>Әр цифр бойынша F1</h3>
+        <div class="f1-list">
+          {% for d in range(10) %}
+          {% set f = m.per_class[d|string]['f1-score']*100 %}
+          <div class="f1-row"><span class="f1-d">{{ d }}</span>
+            <div class="f1-track"><div class="f1-fill" style="width: {{ ((f-97)/3*100)|round(1) }}%"></div></div>
+            <span class="f1-v">{{ '%.2f' % f }}%</span></div>
+          {% endfor %}
+        </div>
+        <p class="note">Шкала 97%-дан 100%-ға дейін көрсетілген.</p>
+      </div>
+    </div>
+    <div class="res-grid">
+      <div class="card">
+        <h3>Эксперименттерді салыстыру</h3>
+        <div class="cmp">
+          {% for e in m.experiments %}
+          {% set v = e.test_acc|float*100 %}
+          <div class="cmp-row {{ 'me' if e.id == m.best_experiment }}"><span>{{ e.id }} · {{ e.model }}{% if e.note %} <small>({{ e.note }})</small>{% endif %}</span>
+            <div class="cmp-track"><div class="cmp-fill" style="width: {{ ((v-90)/10*100)|round(1) }}%"></div></div>
+            <b>{{ '%.2f' % v }}%</b></div>
+          {% endfor %}
+        </div>
+        <p class="note">Барлық эксперимент бірдей шартта (seed 42, бірдей бөлу) орындалды. Модель validation бойынша таңдалды, мұнда тест дәлдігі көрсетілген (шкала 90–100%).</p>
+      </div>
+      <figure class="card fig"><img src="/results/misclassified.png" alt="Қате мысалдар"><figcaption>Модель қателескен мысалдар — олардың көбі адам үшін де екіұшты</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Жоба туралы ============ -->
+<section class="section" id="about">
+  <div class="container about">
+    <div>
+      <span class="eyebrow">Жоба туралы</span>
+      <h2>Курстық жұмыс</h2>
+      <p class="lead">«Конволюциялық нейрондық желілер негізінде қолжазба цифрларды тану жүйесін әзірлеу»</p>
+      <div class="chips">
+        <span>Python</span><span>PyTorch</span><span>scikit-learn</span><span>Flask</span><span>NumPy</span><span>HTML · CSS · JS</span><span>MNIST (CC BY-SA 3.0)</span>
+      </div>
+    </div>
+    <div class="card info">
+      <div><span>Орындаған</span><b>Аязбай Диас</b></div>
+      <div><span>Тобы</span><b>ЖИТ-31</b></div>
+      <div><span>Курс</span><b>3-курс, 6В06112</b></div>
+      <div><span>Пән</span><b>Терең оқыту (TO 4304)</b></div>
+      <div><span>Ғылыми жетекші</span><b>Максутова К.М.</b></div>
+      <div><span>Кафедра</span><b>Жасанды интеллект технологиялары</b></div>
+      <div><span>Университет</span><b>Л.Н. Гумилев атындағы ЕҰУ</b></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">© 2026 DigitNet · Л.Н. Гумилев атындағы Еуразия ұлттық университеті · Астана</div>
+</footer>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
